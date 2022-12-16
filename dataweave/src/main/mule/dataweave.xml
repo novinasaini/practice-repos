@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="fd2f52f4-0749-478d-a18b-abd31ba8a53c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dataweaveFlow" doc:id="b97ac04c-2634-44da-ace0-102a7caba3e3" >
+		<http:listener doc:name="Listener" doc:id="6ae829ad-66ea-4e21-9726-f7a8223f8427" config-ref="HTTP_Listener_config" path="/students"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bcf1a0f3-aeb7-43d5-b201-34a8d738eaa0" message="recieved payload&#10;var recieved = ???&#10;---&#10;recieved payload"/>
+		<logger level="INFO" doc:name="Logger" doc:id="56cad890-e131-4576-b227-76032aecd9e4" message="transformed payload"/>
+		<ee:transform doc:name="Transform Message" doc:id="a6d182f0-d677-4ca6-89ad-95c3479637dc">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+
+output application/json
+---
+payload map (k,v)->{
+	firstname:k.fname,
+	lastname:k.lname
+} ++
+[{
+	firstname: "bala",
+	lastname: "volla"
+}]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="dd"><![CDATA[%dw 2.0
+output application/java
+---
+"jeevan"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="30427d99-c5d9-482b-8e69-f529aaf97448" />
+	</flow>
+</mule>
